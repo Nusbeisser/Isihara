@@ -9,10 +9,7 @@ body {
   background-color: #0095ff;
   width: 100%;
 }
-.hidden {
-  display: none;
-}
-/* CSS */
+
 .custom-button {
   background-color: #0095ff;
   border: 1px solid transparent;
@@ -52,4 +49,8 @@ body {
 .custom-button:active {
   background-color: #0064bd;
   box-shadow: none;
+}
+
+.hidden {
+  display: none;
 }

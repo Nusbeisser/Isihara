@@ -75,8 +75,8 @@ export async function modifyChannel2(
   channel: string,
   valueModifier: number
 ): Promise<[ImageData, any]> {
-  console.log(imagePath);
-  const image = await Jimp.read(imagePath);
+  const beforeScaleImage = await Jimp.read(imagePath);
+  const image = beforeScaleImage.resize({ w: 500, h: 500 });
   const canvas = document.getElementById("outCanvas") as HTMLCanvasElement;
   const context = canvas.getContext("2d");
   let red, green, blue;
@@ -86,9 +86,9 @@ export async function modifyChannel2(
     image.bitmap.width,
     image.bitmap.height,
     (x: number, y: number, idx: number) => {
-      red = image.bitmap.data[idx]; //  R
-      green = image.bitmap.data[idx + 1]; //  G
-      blue = image.bitmap.data[idx + 2]; //  B
+      red = image.bitmap.data[idx];
+      green = image.bitmap.data[idx + 1];
+      blue = image.bitmap.data[idx + 2];
       if (channel === "red") {
         image.bitmap.data[idx] = Math.min(
           255,

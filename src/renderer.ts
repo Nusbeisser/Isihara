@@ -19,13 +19,24 @@ const createImagesArray = () => {
 
   imagesArray.push(image1, image2, image3);
 };
-import { hide, outCanvas, showResults, startButton } from "./DOM/dom";
+import {
+  hide,
+  outCanvas,
+  show,
+  showResults,
+  startButton,
+  buttonRe,
+  resultsContainer,
+  stopButton,
+  remove,
+  startDesc,
+  channelInput,
+  channelRange,
+  channelRangeDesc,
+} from "./DOM/dom";
 
-const canvasIn = document.getElementById("inCanvas") as HTMLCanvasElement;
-const contextIn = canvasIn.getContext("2d");
 const imagesArray: HTMLImageElement[] = [];
-// Ścieżka do obrazu
-const imagePath = "./assets/2.png";
+
 let testRunning = false;
 
 // test variables
@@ -37,28 +48,55 @@ let interval: NodeJS.Timeout;
 let startingSaturation = -255;
 const canvas = document.getElementById("outCanvas") as HTMLCanvasElement;
 const context = canvas.getContext("2d");
+let selectedChannel = "red";
+let channelRangeValue = 10;
+
+let keydownListener: (event: KeyboardEvent) => void;
+let keyupListener: (event: KeyboardEvent) => void;
 
 createImagesArray();
-console.log(imagePath);
-imagesArray[0].onload = async () => {
-  contextIn.drawImage(imagesArray[0], 0, 0, canvasIn.width, canvasIn.height);
-};
-imagesArray[0].onerror = (err) => {
-  console.error("Nie udało się załadować obrazu:", err);
-};
 
 startButton.addEventListener("click", async () => {
-  if (!testRunning) {
-    test(imagesArray);
-  }
+  if (testRunning) return;
+  console.log(imagesArray);
+  test(imagesArray);
+  hide([startDesc]);
+  show([canvas, stopButton]);
+});
+stopButton.addEventListener("click", async () => {
+  resetAll();
+});
+buttonRe.addEventListener("click", async () => {
+  console.log("re");
+  resetAll();
+});
+channelInput.addEventListener("change", async () => {
+  console.log(channelInput.options[channelInput.selectedIndex].value);
+  selectedChannel = channelInput.options[channelInput.selectedIndex].value;
+});
+channelRange.addEventListener("input", (e) => {
+  const value =
+    e.target instanceof HTMLInputElement ? e.target.value : undefined;
+  channelRangeDesc.innerHTML = value;
+  channelRangeValue = Number(value);
 });
 
-const test = async (images: HTMLImageElement[], channel = "red") => {
-  testRunning = true;
-  loadNewImage(images[processingImageIndex].src, channel);
+const test = async (images: HTMLImageElement[]) => {
+  if (keydownListener) {
+    document.removeEventListener("keydown", keydownListener);
+  }
+  if (keyupListener) {
+    document.removeEventListener("keyup", keyupListener);
+  }
 
-  document.addEventListener("keydown", async (event) => {
-    if (event.key === " " && !spacePressed) {
+  testRunning = true;
+  console.log(images);
+  loadNewImage(images[processingImageIndex].src, selectedChannel);
+  document.removeEventListener("keydown", () => {
+    console.log("a");
+  });
+  keydownListener = async (event) => {
+    if (event.key === " " && !spacePressed && testRunning) {
       console.log(resultsArray);
       if (processingImageIndex === images.length - 1) {
         const result = await analyzeRGBComponentsFromCanvas(canvas);
@@ -72,9 +110,10 @@ const test = async (images: HTMLImageElement[], channel = "red") => {
         clearInterval(interval);
       }
       if (processingImageIndex === images.length) {
-        // testRunning = false;
-        showResults(resultsArray);
-        hide(outCanvas);
+        testRunning = false;
+        showResults(resultsArray, testRunning);
+        clearInterval(interval);
+        hide([outCanvas]);
         return;
       }
       spacePressed = true;
@@ -87,14 +126,19 @@ const test = async (images: HTMLImageElement[], channel = "red") => {
         blue: result.blue,
       });
       processingImageIndex++;
-      loadNewImage(images[processingImageIndex].src, channel);
+      console.log("processingImageIndex", processingImageIndex);
+      console.log("images.length", images.length);
+      loadNewImage(images[processingImageIndex].src, selectedChannel);
     }
-  });
-  document.addEventListener("keyup", (event) => {
+  };
+  keyupListener = (event) => {
     if (event.key === " " && spacePressed) {
       spacePressed = false;
     }
-  });
+  };
+
+  document.addEventListener("keydown", keydownListener);
+  document.addEventListener("keyup", keyupListener);
 };
 
 const loadNewImage = async (imgSrc: string, channel: string) => {
@@ -112,7 +156,7 @@ const loadNewImage = async (imgSrc: string, channel: string) => {
 
 const setImageInterval = (imgSrc: string, channel: string) => {
   return setInterval(async () => {
-    startingSaturation += 2.5;
+    startingSaturation += channelRangeValue;
     const imgData = await modifyChannel2(imgSrc, channel, startingSaturation);
     context.putImageData(
       imgData[0],
@@ -124,11 +168,44 @@ const setImageInterval = (imgSrc: string, channel: string) => {
       imgData[0].height
     );
     analyzeRGBComponentsFromCanvas(canvas);
-
-    if (startingSaturation >= 255) clearInterval(interval);
+    if (startingSaturation >= 255) {
+      clearInterval(interval);
+      document.dispatchEvent(new KeyboardEvent("keydown", { key: " " }));
+      document.dispatchEvent(new KeyboardEvent("keyup", { key: " " }));
+    }
   }, 125);
 };
 
 const resetAll = () => {
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  clearInterval(interval);
+  testRunning = false;
   console.log("reset");
+  resultsArray.length = 0;
+  processingImageIndex = 0;
+  startingSaturation = -255;
+  hide([resultsContainer, stopButton, canvas]);
+  show([startDesc]);
+  remove([document.getElementById("resultsList")]);
 };
+
+const selectAndSaveButton = document.getElementById("selectPng");
+const status = document.getElementById("status");
+
+selectAndSaveButton.addEventListener("click", async () => {
+  imagesArray.length = 0;
+  const savedPaths = await window.electronAPI.savePngFile();
+
+  if (savedPaths.length > 0) {
+    status.textContent = `Wybrano plików: ${savedPaths.length}.`;
+    savedPaths.map((path) => {
+      console.log(path);
+      const img = new Image();
+      img.src = `./assets/${path}`;
+
+      imagesArray.push(img);
+    });
+  } else {
+    createImagesArray();
+  }
+});

@@ -8,12 +8,60 @@
     <div class="topbar">
       <h1>Simple Ishihara testing</h1>
     </div>
-    <p>To jest krótki opis Twojej aplikacji stworzonej w Electron.js.</p>
-    <canvas id="inCanvas" width="500" height="500"></canvas>
-    <p>Górne zdjęcie tylko na potrzeby developmentu</p>
-    <button class="custom-button" id="startButton">Start</button>
-    <button class="custom-button" id="stopButton">Stop</button>
-    <canvas id="outCanvas" width="500" height="500"></canvas>
-    <div id="results"></div>
+    <div id="startDesc">
+      <p>
+        Aby przeprowadzić test nalezy wybrać badaną składową: R (czerwony), G
+        (zielony), B (niebieski) oraz dodać zdjęcia w formacie png. Jeśli nie
+        zostaną dodane zdjęcia, program wykorzysta własne zasoby.
+      </p>
+      <p>
+        Po naciśnięciu przycisku Start pojawi się obraz którego kolor będzie się
+        zmieniał w czasie (maksymalnie około 30 sekund). Gdy na obrazie zostanie
+        rozpoznana cyfra należy wcisnąć spację, wtedy zostanie załadowany
+        kolejny obraz. Po przejściu przez wszystkie obraz zostaną wyświetlone
+        wyniki. W przypadku, gdy nasycenie danej składowej osiągnie wartość
+        maksymalną program automatycznie pokaże kolejny obraz. W trakcie testu
+        można użyć przycisku stop w celu zatrzymania, ale wiąże się to z
+        koniecznością wznowienia go od początku.
+      </p>
+      <!-- <canvas id="inCanvas" width="500" height="500"></canvas>
+    <p>Górne zdjęcie tylko na potrzeby developmentu</p> -->
+      <label for="channel">Składowa:</label>
+      <select name="channel" id="channel">
+        <option value="red">Czerwona</option>
+        <option value="green">Zielona</option>
+        <option value="blue">Niebieska</option>
+      </select>
+      <div>
+        <label for="channelRange">Skok składowej:</label>
+        <input
+          type="range"
+          id="channelRange"
+          name="channelRange"
+          min="1"
+          max="100"
+          value="10"
+        />
+        <span id="channelRangeDesc">10</span>
+      </div>
+      <div style="margin-top: 10px">
+        <button class="custom-button" id="selectPng">
+          Dodaj własne obrazy
+        </button>
+        <p id="status"></p>
+      </div>
+      <button class="custom-button" id="startButton">Start</button>
+    </div>
+    <canvas class="hidden" id="outCanvas" width="500" height="500"></canvas>
+    <div>
+      <button class="custom-button hidden" id="stopButton">Stop</button>
+    </div>
+    <div class="hidden" id="results">
+      <div>Wyniki testu</div>
+      <div id="resultsListContainer"></div>
+      <button class="custom-button" id="retest">Ponowny test</button>
+      <button class="custom-button" id="pdf">Wygeneruj PDF</button>
+      <button class="custom-button" id="csv">Wygeneruj CSV</button>
+    </div>
   </body>
 </html>
