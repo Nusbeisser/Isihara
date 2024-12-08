@@ -1,6 +1,5 @@
 import "./index.css";
 // import test from "./test";
-
 import { modifyChannel2 } from "./saturation/saturationChange";
 import { Result } from "./types/results.interface";
 import { analyzeRGBComponentsFromCanvas } from "./saturation/saturationMeasurement";
@@ -199,11 +198,13 @@ selectAndSaveButton.addEventListener("click", async () => {
   if (savedPaths.length > 0) {
     status.textContent = `Wybrano plików: ${savedPaths.length}.`;
     savedPaths.map((path) => {
-      console.log(path);
+      console.log("Ścieżka: " + path);
       const img = new Image();
-      img.src = `./assets/${path}`;
+      // img.src = `./assets/${path}`;
+      img.src = path;
 
       imagesArray.push(img);
+      console.log(imagesArray);
     });
   } else {
     createImagesArray();

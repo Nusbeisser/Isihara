@@ -40,17 +40,19 @@ const createWindow = (): void => {
 
     if (!result.canceled && result.filePaths.length > 0) {
       console.log("bb");
-      const destFolder = path.join(__dirname, "../renderer/assets");
+      // const destFolder = path.join(__dirname, "../renderer/assets");
+      const destFolder = path.join(app.getPath("userData"), "assets");
+      // const destFolder = path.join(process.resourcesPath, "assets");
       fs.mkdirSync(destFolder, { recursive: true });
 
       const copiedFiles = [];
       for (const sourcePath of result.filePaths) {
         console.log(sourcePath);
-        const fileName = path.basename(sourcePath + "-own");
+        const fileName = path.basename("own-" + sourcePath);
         const destPath = path.join(destFolder, fileName);
 
         fs.copyFileSync(sourcePath, destPath);
-        copiedFiles.push(fileName);
+        copiedFiles.push(destPath);
       }
 
       return copiedFiles;
