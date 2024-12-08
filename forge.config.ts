@@ -11,8 +11,12 @@ import { FuseV1Options, FuseVersion } from "@electron/fuses";
 import { mainConfig } from "./webpack.main.config";
 import { rendererConfig } from "./webpack.renderer.config";
 
+// import path from 'path'
+
+// path.join(process.resourcesPath, YOUR_EXTRA_RESOURCES_FILES);
+
 const config: ForgeConfig = {
-  packagerConfig: { asar: true, extraResource: ["./src/assets/*"] },
+  packagerConfig: { asar: true, extraResource: ["./src/assets"] },
   rebuildConfig: {},
   makers: [
     new MakerSquirrel({}),

@@ -9,8 +9,11 @@ body {
   background-color: #0095ff;
   width: 100%;
 }
+.hidden {
+  display: none;
+}
 /* CSS */
-.button-7 {
+.custom-button {
   background-color: #0095ff;
   border: 1px solid transparent;
   border-radius: 3px;
@@ -37,16 +40,16 @@ body {
   white-space: nowrap;
 }
 
-.button-7:hover,
-.button-7:focus {
+.custom-button:hover,
+.custom-button:focus {
   background-color: #07c;
 }
 
-.button-7:focus {
+.custom-button:focus {
   box-shadow: 0 0 0 4px rgba(0, 149, 255, 0.15);
 }
 
-.button-7:active {
+.custom-button:active {
   background-color: #0064bd;
   box-shadow: none;
 }
