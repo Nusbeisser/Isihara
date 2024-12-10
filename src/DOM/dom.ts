@@ -1,4 +1,6 @@
+import { ipcMain } from "electron";
 import { Result } from "../types/results.interface";
+import { generateCsv, generatePdf } from "../renderer";
 
 export const startButton = document.getElementById("startButton");
 export const stopButton = document.getElementById("stopButton");
@@ -21,6 +23,13 @@ export const startDesc = document.getElementById("startDesc");
 export const buttonRe = document.getElementById("retest");
 export const buttonPdf = document.getElementById("pdf");
 export const buttonCsv = document.getElementById("csv");
+
+buttonPdf.addEventListener("click", async () => {
+  generatePdf();
+});
+buttonCsv.addEventListener("click", async () => {
+  generateCsv();
+});
 
 export const hide = (elements: HTMLElement[]) => {
   if (elements.length > 0 && elements[0] !== null)

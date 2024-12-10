@@ -7,7 +7,7 @@ import { analyzeRGBComponentsFromCanvas } from "./saturation/saturationMeasureme
 import * as img1 from "./assets/2.png";
 import * as img2 from "./assets/6.png";
 import * as img3 from "./assets/7.png";
-
+import * as logoWSPAsrc from "./assets/logoWSPA.png";
 const createImagesArray = () => {
   const image1 = new Image();
   image1.src = img1.default;
@@ -15,6 +15,9 @@ const createImagesArray = () => {
   image2.src = img2.default;
   const image3 = new Image();
   image3.src = img3.default;
+
+  const logoWSPA = new Image();
+  logoWSPA.src = logoWSPAsrc.default;
 
   imagesArray.push(image1, image2, image3);
 };
@@ -57,7 +60,6 @@ createImagesArray();
 
 startButton.addEventListener("click", async () => {
   if (testRunning) return;
-  console.log(imagesArray);
   test(imagesArray);
   hide([startDesc]);
   show([canvas, stopButton]);
@@ -66,11 +68,9 @@ stopButton.addEventListener("click", async () => {
   resetAll();
 });
 buttonRe.addEventListener("click", async () => {
-  console.log("re");
   resetAll();
 });
 channelInput.addEventListener("change", async () => {
-  console.log(channelInput.options[channelInput.selectedIndex].value);
   selectedChannel = channelInput.options[channelInput.selectedIndex].value;
 });
 channelRange.addEventListener("input", (e) => {
@@ -89,14 +89,9 @@ const test = async (images: HTMLImageElement[]) => {
   }
 
   testRunning = true;
-  console.log(images);
   loadNewImage(images[processingImageIndex].src, selectedChannel);
-  document.removeEventListener("keydown", () => {
-    console.log("a");
-  });
   keydownListener = async (event) => {
     if (event.key === " " && !spacePressed && testRunning) {
-      console.log(resultsArray);
       if (processingImageIndex === images.length - 1) {
         const result = await analyzeRGBComponentsFromCanvas(canvas);
         resultsArray.push({
@@ -125,8 +120,6 @@ const test = async (images: HTMLImageElement[]) => {
         blue: result.blue,
       });
       processingImageIndex++;
-      console.log("processingImageIndex", processingImageIndex);
-      console.log("images.length", images.length);
       loadNewImage(images[processingImageIndex].src, selectedChannel);
     }
   };
@@ -176,10 +169,10 @@ const setImageInterval = (imgSrc: string, channel: string) => {
 };
 
 const resetAll = () => {
+  console.log("reset");
   context.clearRect(0, 0, canvas.width, canvas.height);
   clearInterval(interval);
   testRunning = false;
-  console.log("reset");
   resultsArray.length = 0;
   processingImageIndex = 0;
   startingSaturation = -255;
@@ -198,15 +191,24 @@ selectAndSaveButton.addEventListener("click", async () => {
   if (savedPaths.length > 0) {
     status.textContent = `Wybrano plików: ${savedPaths.length}.`;
     savedPaths.map((path) => {
-      console.log("Ścieżka: " + path);
       const img = new Image();
-      // img.src = `./assets/${path}`;
       img.src = path;
-
       imagesArray.push(img);
-      console.log(imagesArray);
     });
   } else {
     createImagesArray();
   }
 });
+
+export const generatePdf = async () => {
+  const resultPdf = await window.electronAPI.createPdf(
+    resultsArray,
+    selectedChannel
+  );
+  console.log(resultPdf);
+};
+
+export const generateCsv = async () => {
+  const resultCsv = await window.electronAPI.createCSV(resultsArray);
+  console.log(resultCsv);
+};

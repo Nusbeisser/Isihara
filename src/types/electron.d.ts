@@ -1,9 +1,16 @@
+import { Result } from "./results.interface";
+
 export interface ElectronAPI {
-  savePngFile: () => Promise<[] | null>; // Funkcja zwraca ścieżkę pliku lub null
+  createCSV(data: Result[]): Promise<{ success: boolean } | null>;
+  createPdf: (
+    resultsArray: Result[],
+    selectedChannel: string
+  ) => Promise<{ success: boolean } | null>;
+  savePngFile: () => Promise<[] | null>;
 }
 
 declare global {
   interface Window {
-    electronAPI: ElectronAPI; // Dodajemy typ dla window.electronAPI
+    electronAPI: ElectronAPI;
   }
 }

@@ -21,6 +21,7 @@
     "@electron-forge/plugin-fuses": "^7.6.0",
     "@electron-forge/plugin-webpack": "^7.6.0",
     "@electron/fuses": "^1.8.0",
+    "@types/pdfkit": "^0.13.7",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "@vercel/webpack-asset-relocator-loader": "^1.7.3",
@@ -47,6 +48,7 @@
     "@jimp/types": "^1.6.0",
     "buffer": "^6.0.3",
     "electron-squirrel-startup": "^1.0.1",
-    "jimp": "^1.6.0"
+    "jimp": "^1.6.0",
+    "pdfkit": "^0.15.1"
   }
 }
