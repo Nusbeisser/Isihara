@@ -1,6 +1,6 @@
 import "./index.css";
 // import test from "./test";
-import { modifyChannel2 } from "./saturation/saturationChange";
+import { modifyChannel } from "./saturation/saturationChange";
 import { Result } from "./types/results.interface";
 import { analyzeRGBComponentsFromCanvas } from "./saturation/saturationMeasurement";
 
@@ -26,8 +26,6 @@ import {
   outCanvas,
   show,
   showResults,
-  startButton,
-  buttonRe,
   resultsContainer,
   stopButton,
   remove,
@@ -35,6 +33,10 @@ import {
   channelInput,
   channelRange,
   channelRangeDesc,
+  status,
+  channelClear,
+  timeRange,
+  timeRangeDesc,
 } from "./DOM/dom";
 
 const imagesArray: HTMLImageElement[] = [];
@@ -46,30 +48,22 @@ let spacePressed = false;
 const resultsArray: Result[] = [];
 let startDate: number;
 let processingImageIndex = 0;
-let interval: NodeJS.Timeout;
+let timeout: NodeJS.Timeout;
 let startingSaturation = -255;
 const canvas = document.getElementById("outCanvas") as HTMLCanvasElement;
 const context = canvas.getContext("2d");
 let selectedChannel = "red";
 let channelRangeValue = 10;
+let timeRangeValue = 8;
+let isChannelClear = false;
+let resultDate = "";
+let autoNext = false;
 
 let keydownListener: (event: KeyboardEvent) => void;
 let keyupListener: (event: KeyboardEvent) => void;
 
 createImagesArray();
 
-startButton.addEventListener("click", async () => {
-  if (testRunning) return;
-  test(imagesArray);
-  hide([startDesc]);
-  show([canvas, stopButton]);
-});
-stopButton.addEventListener("click", async () => {
-  resetAll();
-});
-buttonRe.addEventListener("click", async () => {
-  resetAll();
-});
 channelInput.addEventListener("change", async () => {
   selectedChannel = channelInput.options[channelInput.selectedIndex].value;
 });
@@ -79,8 +73,22 @@ channelRange.addEventListener("input", (e) => {
   channelRangeDesc.innerHTML = value;
   channelRangeValue = Number(value);
 });
+channelClear.addEventListener("change", (e) => {
+  const value =
+    e.target instanceof HTMLInputElement ? e.target.checked : undefined;
+  isChannelClear = value;
+});
+timeRange.addEventListener("input", (e) => {
+  const value =
+    e.target instanceof HTMLInputElement ? e.target.value : undefined;
+  timeRangeDesc.innerHTML = value;
+  timeRangeValue = Number(value);
+});
 
-const test = async (images: HTMLImageElement[]) => {
+export const test = async () => {
+  if (testRunning) return;
+  hide([startDesc]);
+  show([canvas, stopButton]);
   if (keydownListener) {
     document.removeEventListener("keydown", keydownListener);
   }
@@ -89,38 +97,40 @@ const test = async (images: HTMLImageElement[]) => {
   }
 
   testRunning = true;
-  loadNewImage(images[processingImageIndex].src, selectedChannel);
+  loadNewImage(imagesArray[processingImageIndex].src, selectedChannel);
   keydownListener = async (event) => {
+    clearTimeout(timeout);
     if (event.key === " " && !spacePressed && testRunning) {
-      if (processingImageIndex === images.length - 1) {
-        const result = await analyzeRGBComponentsFromCanvas(canvas);
+      if (processingImageIndex === imagesArray.length - 1) {
+        const result = await analyzeRGBComponentsFromCanvas(canvas, !autoNext);
         resultsArray.push({
           time: Date.now() - startDate,
           red: result.red,
           green: result.green,
           blue: result.blue,
+          spacePressed: result.spacePressed,
         });
         processingImageIndex++;
-        clearInterval(interval);
       }
-      if (processingImageIndex === images.length) {
+      if (processingImageIndex === imagesArray.length) {
         testRunning = false;
+        resultDate = new Date().toLocaleDateString("pl-PL");
         showResults(resultsArray, testRunning);
-        clearInterval(interval);
         hide([outCanvas]);
         return;
       }
       spacePressed = true;
-      clearInterval(interval);
-      const result = await analyzeRGBComponentsFromCanvas(canvas);
+      const result = await analyzeRGBComponentsFromCanvas(canvas, !autoNext);
       resultsArray.push({
         time: Date.now() - startDate,
         red: result.red,
         green: result.green,
         blue: result.blue,
+        spacePressed: result.spacePressed,
       });
+      autoNext = false;
       processingImageIndex++;
-      loadNewImage(images[processingImageIndex].src, selectedChannel);
+      loadNewImage(imagesArray[processingImageIndex].src, selectedChannel);
     }
   };
   keyupListener = (event) => {
@@ -134,22 +144,30 @@ const test = async (images: HTMLImageElement[]) => {
 };
 
 const loadNewImage = async (imgSrc: string, channel: string) => {
-  startingSaturation = -255;
-  const [imgData, saturationLevels] = await modifyChannel2(
+  startingSaturation = isChannelClear ? -255 : 0;
+  const [imgData, saturationLevels] = await modifyChannel(
     imgSrc,
     channel,
-    -255
+    startingSaturation
   );
   context.putImageData(imgData, 0, 0, 0, 0, imgData.width, imgData.height);
   startDate = Date.now();
 
-  interval = setImageInterval(imgSrc, channel);
+  timeout = setImageTimeout(imgSrc, channel);
 };
 
-const setImageInterval = (imgSrc: string, channel: string) => {
-  return setInterval(async () => {
+const setImageTimeout = (imgSrc: string, channel: string) => {
+  clearTimeout(timeout);
+  if (!testRunning || !imgSrc) return;
+
+  return setTimeout(async () => {
+    if (!testRunning || !imagesArray[processingImageIndex].src) return;
     startingSaturation += channelRangeValue;
-    const imgData = await modifyChannel2(imgSrc, channel, startingSaturation);
+    const imgData = await modifyChannel(
+      imagesArray[processingImageIndex].src,
+      channel,
+      startingSaturation
+    );
     context.putImageData(
       imgData[0],
       0,
@@ -159,19 +177,23 @@ const setImageInterval = (imgSrc: string, channel: string) => {
       imgData[0].width,
       imgData[0].height
     );
-    analyzeRGBComponentsFromCanvas(canvas);
+    // analyzeRGBComponentsFromCanvas(canvas, false);
     if (startingSaturation >= 255) {
-      clearInterval(interval);
+      autoNext = true;
       document.dispatchEvent(new KeyboardEvent("keydown", { key: " " }));
       document.dispatchEvent(new KeyboardEvent("keyup", { key: " " }));
     }
-  }, 125);
+    timeout = setTimeout(() => {
+      if (!testRunning || !imagesArray[processingImageIndex].src) return;
+      setImageTimeout(imagesArray[processingImageIndex].src, channel);
+    }, (1 / timeRangeValue) * 1000);
+  }, (1 / timeRangeValue) * 1000);
 };
 
-const resetAll = () => {
+export const resetAll = () => {
   console.log("reset");
   context.clearRect(0, 0, canvas.width, canvas.height);
-  clearInterval(interval);
+  clearTimeout(timeout);
   testRunning = false;
   resultsArray.length = 0;
   processingImageIndex = 0;
@@ -181,15 +203,12 @@ const resetAll = () => {
   remove([document.getElementById("resultsList")]);
 };
 
-const selectAndSaveButton = document.getElementById("selectPng");
-const status = document.getElementById("status");
-
-selectAndSaveButton.addEventListener("click", async () => {
+export const selectAndSavePng = async () => {
   imagesArray.length = 0;
   const savedPaths = await window.electronAPI.savePngFile();
 
   if (savedPaths.length > 0) {
-    status.textContent = `Wybrano plików: ${savedPaths.length}.`;
+    status.textContent = `Wybrano zdjęć: ${savedPaths.length}.`;
     savedPaths.map((path) => {
       const img = new Image();
       img.src = path;
@@ -198,12 +217,13 @@ selectAndSaveButton.addEventListener("click", async () => {
   } else {
     createImagesArray();
   }
-});
+};
 
 export const generatePdf = async () => {
   const resultPdf = await window.electronAPI.createPdf(
     resultsArray,
-    selectedChannel
+    selectedChannel,
+    resultDate
   );
   console.log(resultPdf);
 };

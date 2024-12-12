@@ -111,7 +111,8 @@ import { Buffer } from "buffer";
 // }
 
 export async function analyzeRGBComponentsFromCanvas(
-  canvas: HTMLCanvasElement
+  canvas: HTMLCanvasElement,
+  spacePressed: boolean
 ) {
   let totalRed = 0,
     totalGreen = 0,
@@ -159,5 +160,6 @@ export async function analyzeRGBComponentsFromCanvas(
     red: { avg: avgRed, max: maxRed },
     green: { avg: avgGreen, max: maxGreen },
     blue: { avg: avgBlue, max: maxBlue },
+    spacePressed: spacePressed,
   };
 }

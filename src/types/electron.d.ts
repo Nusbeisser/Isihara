@@ -4,7 +4,8 @@ export interface ElectronAPI {
   createCSV(data: Result[]): Promise<{ success: boolean } | null>;
   createPdf: (
     resultsArray: Result[],
-    selectedChannel: string
+    selectedChannel: string,
+    resultDate: string
   ) => Promise<{ success: boolean } | null>;
   savePngFile: () => Promise<[] | null>;
 }

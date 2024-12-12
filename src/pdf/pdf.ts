@@ -4,7 +4,8 @@ import PDFDocument from "pdfkit";
 
 export const savePDFToFile = (
   resultsArray: Result[],
-  selectedChannel: string,
+  selectedChannel: "red" | "green" | "blue",
+  resultDate: string,
   filePath: string
 ) => {
   const testedChannel =
@@ -17,7 +18,7 @@ export const savePDFToFile = (
 
   doc.pipe(fs.createWriteStream(filePath));
 
-  doc.image(`${logoBase64}`);
+  doc.image(logoBase64);
 
   doc
     .fontSize(20)
@@ -28,35 +29,46 @@ export const savePDFToFile = (
     .text(
       "Raport wygenerowany za pomoca zaliczeniowego programu o nazwie Isihara."
     );
+  doc.moveDown().fontSize(12).text(`Data wykonania testu: ${resultDate}`);
   doc.moveDown().fontSize(12).text(`Testowana skladowa: ${testedChannel}`);
   doc
     .moveDown()
     .fontSize(14)
-    .text("Tabela wyników:", 150, 270, { underline: true });
+    .text("Tabela wyników:", 100, 280, { underline: true });
 
-  const myTable = [["Nr obrazu", "Czas [ms]", "Sredni poziom skladowej"]];
+  const myTable = [
+    ["Nr obrazu", "Czas [ms]", "Sredni poziom skladowej", "Wcisniety klawisz"],
+  ];
   const myBarValues: number[] = [];
 
   resultsArray.map((el: Result, index: number) => {
     myTable.push([
       (index + 1).toString(),
       el.time.toString(),
-      el.red.avg.toString(),
+      el[selectedChannel].avg.toFixed(2).replace(".", ","),
+      el.spacePressed ? "TAK" : "NIE",
     ]);
     myBarValues.push(el.time);
   });
 
-  const startX = 150;
-  const startY = 300;
+  const startX = 100;
+  const startY = 310;
 
   myTable.forEach((row, rowIndex) => {
     row.forEach((cell, colIndex) => {
       doc
         .fontSize(12)
-        .text(cell, startX + colIndex * 100, startY + rowIndex * 20, {
-          width: 220,
-          align: "left",
-        });
+        .text(
+          cell,
+          colIndex === 3
+            ? startX + 40 + colIndex * 100
+            : startX + colIndex * 100,
+          startY + rowIndex * 20,
+          {
+            width: 220,
+            align: "left",
+          }
+        );
     });
   });
   const chartX = 150;

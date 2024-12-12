@@ -5,10 +5,27 @@
     <title>Ishihara Test</title>
   </head>
   <body>
-    <div class="topbar">
+    <header>
+      <img
+        id="logo"
+        alt="number eight around circles resembling ishihara test"
+        width="100"
+      />
       <h1>Simple Ishihara testing</h1>
-    </div>
-    <div id="startDesc">
+    </header>
+    todo:
+    <ol>
+      <li>
+        Zaawansowane raporty: histogramy czasu reakcji, analiza rozkładu
+        progów.??
+      </li>
+      <li>
+        'znaki zapytania w kółko' przy zeruj składować i częśtotliwości po
+        najechaniu info o co chodzi krótkie w dymku
+      </li>
+    </ol>
+
+    <section id="startDesc">
       <p>
         Aby przeprowadzić test nalezy wybrać badaną składową: R (czerwony), G
         (zielony), B (niebieski) oraz dodać zdjęcia w formacie png. Jeśli nie
@@ -16,23 +33,27 @@
       </p>
       <p>
         Po naciśnięciu przycisku Start pojawi się obraz którego kolor będzie się
-        zmieniał w czasie (maksymalnie około 30 sekund). Gdy na obrazie zostanie
-        rozpoznana cyfra należy wcisnąć spację, wtedy zostanie załadowany
-        kolejny obraz. Po przejściu przez wszystkie obraz zostaną wyświetlone
-        wyniki. W przypadku, gdy nasycenie danej składowej osiągnie wartość
-        maksymalną program automatycznie pokaże kolejny obraz. W trakcie testu
-        można użyć przycisku stop w celu zatrzymania, ale wiąże się to z
-        koniecznością wznowienia go od początku.
+        zmieniał w czasie. Gdy na obrazie zostanie rozpoznana cyfra należy
+        wcisnąć spację, wtedy zostanie załadowany kolejny obraz. Po przejściu
+        przez wszystkie obrazy zostaną wyświetlone wyniki. W przypadku, gdy
+        nasycenie danej składowej osiągnie wartość maksymalną program
+        automatycznie pokaże kolejny obraz. W trakcie testu można użyć przycisku
+        stop w celu zatrzymania, ale wiąże się to z koniecznością wznowienia go
+        od początku.
       </p>
-      <!-- <canvas id="inCanvas" width="500" height="500"></canvas>
-    <p>Górne zdjęcie tylko na potrzeby developmentu</p> -->
-      <label for="channel">Składowa:</label>
-      <select name="channel" id="channel">
-        <option value="red">Czerwona</option>
-        <option value="green">Zielona</option>
-        <option value="blue">Niebieska</option>
-      </select>
-      <div>
+      <div class="menuElement">
+        <label for="channel">Składowa:</label>
+        <select name="channel" id="channel">
+          <option value="red">Czerwona</option>
+          <option value="green">Zielona</option>
+          <option value="blue">Niebieska</option>
+        </select>
+      </div>
+      <div class="menuElement">
+        <input type="checkbox" id="channelClear" name="channelClear" />
+        <label id="channelClearLabel" for="channelClear">Zeruj składową</label>
+      </div>
+      <div class="menuElement" id="channelRangeContainer">
         <label for="channelRange">Skok składowej:</label>
         <input
           type="range"
@@ -44,6 +65,18 @@
         />
         <span id="channelRangeDesc">10</span>
       </div>
+      <div class="menuElement" id="timeRangeContainer">
+        <label for="timeRange">Częstotliwość zmian:</label>
+        <input
+          type="range"
+          id="timeRange"
+          name="timeRange"
+          min="1"
+          max="20"
+          value="8"
+        />
+        <span id="timeRangeDesc">8</span><span> Hz</span>
+      </div>
       <div style="margin-top: 10px">
         <button class="custom-button" id="selectPng">
           Dodaj własne obrazy
@@ -51,17 +84,30 @@
         <p id="status"></p>
       </div>
       <button class="custom-button" id="startButton">Start</button>
-    </div>
-    <canvas class="hidden" id="outCanvas" width="500" height="500"></canvas>
-    <div>
-      <button class="custom-button hidden" id="stopButton">Stop</button>
-    </div>
-    <div class="hidden" id="results">
-      <div>Wyniki testu</div>
+    </section>
+    <section id="test">
+      <canvas class="hidden" id="outCanvas" width="500" height="500"></canvas>
+      <div>
+        <button class="custom-button hidden" id="stopButton">Stop</button>
+      </div>
+    </section>
+    <section class="hidden" id="results">
+      <h2>Wyniki testu</h2>
       <div id="resultsListContainer"></div>
       <button class="custom-button" id="retest">Ponowny test</button>
       <button class="custom-button" id="pdf">Wygeneruj PDF</button>
       <button class="custom-button" id="csv">Wygeneruj CSV</button>
-    </div>
+    </section>
+    <footer>
+      Logo sponsored by:
+      <a
+        href="https://www.flaticon.com/free-icons/ophthalmology"
+        title="ophthalmology icons"
+        target="_blank"
+        >Ophthalmology icons created by Freepik - Flaticon</a
+      >
+    </footer>
   </body>
+  <div class="hidden" id="countdownModal"></div>
+  <div class="hidden" id="countdownNumber">3</div>
 </html>
