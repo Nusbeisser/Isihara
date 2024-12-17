@@ -13,15 +13,10 @@
       />
       <h1>Simple Ishihara testing</h1>
     </header>
-    todo:
     <ol>
       <li>
         Zaawansowane raporty: histogramy czasu reakcji, analiza rozkładu
         progów.??
-      </li>
-      <li>
-        'znaki zapytania w kółko' przy zeruj składować i częśtotliwości po
-        najechaniu info o co chodzi krótkie w dymku
       </li>
     </ol>
 
@@ -52,6 +47,13 @@
       <div class="menuElement">
         <input type="checkbox" id="channelClear" name="channelClear" />
         <label id="channelClearLabel" for="channelClear">Zeruj składową</label>
+        <div id="tooltip" class="tooltip-container">
+          <span class="tooltip-icon">?</span>
+          <div class="tooltip-text">
+            Zaznaczenie spowoduje wyzerowanie wybranej składowej (R, G, B) w
+            każdym z obrazów przed wyświetleniem go.
+          </div>
+        </div>
       </div>
       <div class="menuElement" id="channelRangeContainer">
         <label for="channelRange">Skok składowej:</label>

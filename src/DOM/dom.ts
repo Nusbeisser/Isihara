@@ -62,8 +62,8 @@ startButton.addEventListener("click", async () => {
 });
 stopButton.addEventListener("click", async () => {
   resetAll();
-  channelClearLabel.after(timeRangeContainer);
-  channelClearLabel.after(channelRangeContainer);
+  tooltip.after(timeRangeContainer);
+  tooltip.after(channelRangeContainer);
 });
 buttonRe.addEventListener("click", async () => {
   resetAll();
@@ -86,18 +86,18 @@ export const remove = (elements: HTMLElement[]) => {
 };
 const countdownModal = document.getElementById("countdownModal");
 const countdownNumber = document.getElementById("countdownNumber");
+export const tooltip = document.getElementById("tooltip");
 export const countdown = () => {
   show([countdownNumber, countdownModal]);
 
   let count = 3;
-  countdownNumber.textContent = count.toString(); // Aktualizacja tekstu
+  countdownNumber.textContent = count.toString();
   count--;
 
   const countdown = setInterval(() => {
-    countdownNumber.textContent = count.toString(); // Aktualizacja tekstu
+    countdownNumber.textContent = count.toString();
     count--;
 
-    // Gdy odliczanie osiągnie 0, zatrzymaj
     if (count < 0) {
       clearInterval(countdown);
       hide([countdownNumber, countdownModal]);
@@ -109,11 +109,9 @@ export const countdown = () => {
 };
 
 export const showResults = (results: Result[], testRunning: boolean) => {
-  console.log("results: ", results);
   if (testRunning) return;
   const resultsList = document.createElement("div");
   resultsList.id = "resultsList";
-  // div.className = "";
   results.map((result, index) => {
     const div = document.createElement("div");
     div.innerHTML = `<p style="font-weight:bold;">Obraz numer: ${
@@ -128,8 +126,8 @@ export const showResults = (results: Result[], testRunning: boolean) => {
     resultsList.append(div);
   });
   resultsListContainer.prepend(resultsList);
-  channelClearLabel.after(timeRangeContainer);
-  channelClearLabel.after(channelRangeContainer);
+  tooltip.after(timeRangeContainer);
+  tooltip.after(channelRangeContainer);
   hide([stopButton]);
   show([resultsContainer]);
 };

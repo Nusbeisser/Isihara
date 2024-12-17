@@ -54,6 +54,19 @@ const config: ForgeConfig = {
       [FuseV1Options.OnlyLoadAppFromAsar]: true,
     }),
   ],
+  publishers: [
+    {
+      name: "@electron-forge/publisher-github",
+      config: {
+        repository: {
+          owner: "nusbeisser",
+          name: "ishihara-app",
+        },
+        prerelease: false,
+        draft: true,
+      },
+    },
+  ],
 };
 
 export default config;

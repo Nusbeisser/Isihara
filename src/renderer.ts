@@ -191,7 +191,6 @@ const setImageTimeout = (imgSrc: string, channel: string) => {
 };
 
 export const resetAll = () => {
-  console.log("reset");
   context.clearRect(0, 0, canvas.width, canvas.height);
   clearTimeout(timeout);
   testRunning = false;
@@ -220,15 +219,9 @@ export const selectAndSavePng = async () => {
 };
 
 export const generatePdf = async () => {
-  const resultPdf = await window.electronAPI.createPdf(
-    resultsArray,
-    selectedChannel,
-    resultDate
-  );
-  console.log(resultPdf);
+  await window.electronAPI.createPdf(resultsArray, selectedChannel, resultDate);
 };
 
 export const generateCsv = async () => {
-  const resultCsv = await window.electronAPI.createCSV(resultsArray);
-  console.log(resultCsv);
+  await window.electronAPI.createCSV(resultsArray);
 };

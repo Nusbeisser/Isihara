@@ -96,14 +96,28 @@ export const savePDFToFile = (
     doc
       .fontSize(10)
       .fillColor("black")
-      .text(`Obraz ${index + 1}`, barX, barY, {
-        width:
-          chartWidth / myBarValues.length - 10 < 30
-            ? 30
-            : chartWidth / myBarValues.length - 10,
+      .text((index + 1).toString(), barX, barY, {
+        width: chartWidth / myBarValues.length - 10,
         align: "center",
       });
   });
+  doc
+    .fontSize(12)
+    .fillColor("black")
+    .text("Numer obrazu", chartX, chartY + chartHeight + 20, {
+      width: chartWidth,
+      align: "center",
+    });
+
+  doc
+    .save()
+    .fontSize(12)
+    .fillColor("black")
+    .rotate(-90, { origin: [chartX - 40, chartY + chartHeight / 2] })
+    .text("Czas [ms]", chartX - 500, chartY + chartHeight / 2 + 20, {
+      align: "center",
+    })
+    .restore();
 
   doc.end();
   return { success: true };
