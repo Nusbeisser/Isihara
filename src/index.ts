@@ -31,7 +31,7 @@ const createWindow = (): void => {
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  isDev ? mainWindow.webContents.openDevTools() : null;
 
   // images handler
   ipcMain.handle("select-and-save-png", async () => {

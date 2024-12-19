@@ -2,7 +2,7 @@
   "name": "isihara",
   "productName": "isihara",
   "version": "1.0.01",
-  "description": "My Electron application description",
+  "description": "Simple app for Ishihara testing",
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",
@@ -41,7 +41,7 @@
   },
   "keywords": [],
   "author": {
-    "name": "Lukanio",
+    "name": "Bakstritboyz",
     "email": "nusbeisser@gmail.com"
   },
   "license": "MIT",
